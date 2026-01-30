@@ -1,0 +1,16 @@
+# .gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+venv/
+env/
+
+# Data RAW (no subir archivos grandes)
+data/raw/*.txt
+data/raw/*.csv
+*.zip
+
+# IDE
+.vscode/
+.DS_Store
