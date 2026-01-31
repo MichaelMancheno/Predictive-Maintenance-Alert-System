@@ -1,72 +1,71 @@
-# src/train_model.py
+"""
+Training script for Predictive Maintenance Model
+Entrena el modelo usando las features generadas en prepare_data.py
+"""
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.preprocessing import StandardScaler
-from sklearn.metrics import accuracy_score, classification_report
 import pickle
 import os
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_absolute_error, r2_score
 
-# Cargar datos procesados
-# Asegúrate de que la ruta sea correcta según tu estructura de carpetas
-if os.path.exists('data/processed/processed_data.csv'):
-    df = pd.read_csv('data/processed/processed_data.csv')
-else:
-    # Intento alternativo de ruta si lo corres desde la raíz
-    df = pd.read_csv('../data/processed/processed_data.csv')
+print("="*60)
+print("ENTRENAMIENTO DEL MODELO PREDICTIVO")
+print("="*60)
 
-# --- CORRECCIÓN CRÍTICA AQUÍ ---
-# Quitamos 'failure' de esta lista. X solo debe tener los datos de entrada.
-features_cols = [
-    'max_vibration', 
-    'mean_vibration', 
-    'std_vibration', 
-    'rms_vibration', 
-    'hours_operation', 
-    'rms_diff', 
-    'severity_ratio', 
-    'relative_std'
-]
+# 1. Cargar datos procesados
+file_path = 'data/processed/processed_data.csv'
 
-# Definir X (Entradas) e y (Objetivo) por separado
-X = df[features_cols]  # X tiene 8 columnas
-y = df['failure']      # y tiene 1 columna
+if not os.path.exists(file_path):
+    print(f"❌ Error: No existe {file_path}. Ejecuta primero prepare_data.py")
+    exit()
 
-# Split
-X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42, stratify=y
-)
+df = pd.read_csv(file_path)
+print(f"📂 Datos cargados: {df.shape}")
 
-# Escalar
-# El scaler ahora aprenderá SOLO sobre las 8 columnas de vibración/horas
+# 2. Separar Features (X) y Target (y)
+target = 'RUL_hours'
+X = df.drop(columns=[target])
+y = df[target]
+
+print("\nFeatures seleccionadas para entrenamiento:")
+print(list(X.columns)) 
+# ESTO DEBE IMPRIMIR: ['max_vibration', ..., 'kurtosis', 'crest_factor', ...]
+
+# 3. Split Train/Test
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 4. Escalar datos (IMPORTANTE: El scaler guardará los nombres de estas columnas)
 scaler = StandardScaler()
+# Ajustamos el scaler con los datos de entrenamiento
 X_train_scaled = scaler.fit_transform(X_train)
 X_test_scaled = scaler.transform(X_test)
 
-# Entrenar
-model = RandomForestClassifier(
-    n_estimators=100, 
-    max_depth=10,
-    random_state=42,
-    class_weight='balanced'
-)
+# 5. Entrenar Modelo
+print("\n🤖 Entrenando Random Forest...")
+model = RandomForestRegressor(n_estimators=100, random_state=42, n_jobs=-1)
 model.fit(X_train_scaled, y_train)
 
-# Evaluar
-y_pred = model.predict(X_test_scaled)
-accuracy = accuracy_score(y_test, y_pred)
+# 6. Evaluar
+predictions = model.predict(X_test_scaled)
+mae = mean_absolute_error(y_test, predictions)
+r2 = r2_score(y_test, predictions)
 
-print(f"✅ Accuracy: {accuracy:.2%}")
-print(classification_report(y_test, y_pred))
+print(f"\n📊 Resultados:")
+print(f"   MAE: {mae:.2f} horas")
+print(f"   R² Score: {r2:.4f}")
 
-# Guardar modelos
-if not os.path.exists('models'):
-    os.makedirs('models')
+# 7. Guardar Modelos
+os.makedirs('models', exist_ok=True)
 
 with open('models/model.pkl', 'wb') as f:
     pickle.dump(model, f)
-    
+
 with open('models/scaler.pkl', 'wb') as f:
     pickle.dump(scaler, f)
 
-print("✅ Modelo entrenado y guardado correctamente en models/")
+print("\n✅ Modelos guardados en carpeta 'models/':")
+print("   - model.pkl")
+print("   - scaler.pkl")
+print("="*60)
