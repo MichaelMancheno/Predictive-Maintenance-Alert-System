@@ -644,12 +644,18 @@ with st.expander("🔬 Información Técnica y Detalles del Modelo"):
 # ===== FOOTER =====
 st.markdown("---")
 st.markdown("""
-<div style='text-align: center; color: gray;'>
-    <p><strong>Desarrollado por Michael Mancheno Medina</strong></p>
-    <p>Ingeniero en Mantenimiento Industrial (EUR-ACE®) | Especialista en Machine Learning</p>
-    <p>🔗 LinkedIn | 💻 GitHub | 📧 Email</p>
-    <p style='font-size: 12px; margin-top: 10px;'>
-        Basado en NASA IMS Bearing Dataset | Cumplimiento con ISO 10816-1 Grupo 2
-    </p>
+<div style='text-align: center; color: #666;'>
+<p style='margin-bottom: 5px;'><strong>Desarrollado por Michael Mancheno Medina</strong></p>
+<p style='margin-bottom: 10px; font-size: 14px;'>
+Ingeniero en Mantenimiento Industrial (EUR-ACE®) <br> Especialista en Machine Learning
+</p>
+<p>
+<a href="https://www.linkedin.com/in/michael-mancheno" target="_blank" style="text-decoration: none; color: #666; margin: 0 10px;">🔗 LinkedIn</a> | 
+<a href="https://github.com/MichaelMancheno/MichaelMancheno" target="_blank" style="text-decoration: none; color: #666; margin: 0 10px;">💻 GitHub</a> | 
+<a href="mailto:maicolmm2001@mail.com" style="text-decoration: none; color: #666; margin: 0 10px;">📧 Email</a>
+</p>
+<p style='font-size: 12px; margin-top: 20px; color: #888;'>
+Basado en NASA IMS Bearing Dataset | Cumplimiento con ISO 10816-1 Grupo 2
+</p>
 </div>
 """, unsafe_allow_html=True)
